@@ -91,8 +91,16 @@ test('credit level: 30-day terms at €80 survive and meet the goal', () => {
 test('governor lab: profit-watcher dies, cash-watcher survives, bullwhip amplifies', () => {
   const by = id => LAB_PRESETS.find(p => p.id === id);
   const run = id => E.runGovernor(LAB_SCENARIOS[by(id).scenario], by(id).params, 3);
-  assert.strictEqual(run('profitblind').game.status, 'insolvent');
-  assert.strictEqual(run('cashsighted').game.status, 'finished');
+  for (let seed = 1; seed <= 20; seed++) {
+    const go = id => E.runGovernor(LAB_SCENARIOS[by(id).scenario], by(id).params, seed).game;
+    const pb = go('profitblind');
+    assert.strictEqual(pb.status, 'insolvent', `profit-watcher seed ${seed}`);
+    assert.ok(pb.bal.re > 0, 'dies while profitable');
+    assert.strictEqual(go('cashsighted').status, 'finished', `cash-watcher seed ${seed}`);
+  }
+  // the two pilots differ only in the gauge
+  const { watch: a, ...pa } = by('profitblind').params, { watch: b, ...pc } = by('cashsighted').params;
+  assert.deepStrictEqual(pa, pc);
   const sd = a => { const m = a.reduce((x, y) => x + y, 0) / a.length; return Math.sqrt(a.reduce((x, y) => x + (y - m) ** 2, 0) / a.length); };
   const ratio = id => {
     const { game, decisions } = run(id);

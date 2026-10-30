@@ -348,7 +348,7 @@
       const v = now + (prev ? now - GAUGES[p.watch].read({ bal: prev }) : 0);
       if (v < p.floor) borrow = Math.round(p.borrowGain * (p.floor - v));
       else if (v > 2 * p.floor && s.bal.loan > 0) borrow = -Math.round(0.5 * (v - 2 * p.floor));
-      if (buyBenches && p.watch !== 'profit') borrow += sc.bench.cost;
+      if (buyBenches) borrow += sc.bench.cost;
     }
     return { price: p.price ?? sc.defaults.price, terms: sc.terms.locked ?? sc.defaults.terms, order, buyBenches, borrow };
   }

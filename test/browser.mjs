@@ -113,6 +113,21 @@ for (let i = 0; i < 7; i++) {
 }
 await shot('09-level5');
 
+// Leave a level mid-animation and start another: the old month must stop cleanly
+await evaluate(`document.querySelector('#modal').hidden = true; document.querySelector('[data-nav="map"]').click(); document.querySelector('[data-level="1"]').click(); true`);
+await sleep(200);
+await evaluate(`document.querySelector('[data-speed="watch"]').click(); document.querySelector('[data-act="open"]').click(); true`);
+await sleep(600);
+await evaluate(`document.querySelector('[data-nav="map"]').click(); document.querySelector('[data-level="0"]').click(); true`);
+await sleep(200);
+await evaluate(`document.querySelector('[data-speed="skip"]').click(); document.querySelector('[data-act="open"]').click(); true`);
+await waitIdle();
+await evaluate(`document.querySelector('#runBtn').click(); true`);
+await waitIdle();
+await sleep(3000);
+const midSwitchOk = await evaluate(`document.querySelector('#lvlTitle').textContent === 'The Cash Counter' && document.querySelector('#periodSel').value === '1'`);
+if (!midSwitchOk) errors.push('mid-run level switch left the wrong state');
+
 // Lab presets
 await evaluate(`document.querySelector('#modal').hidden = true; document.querySelector('[data-nav="lab"]').click(); true`);
 await sleep(400);

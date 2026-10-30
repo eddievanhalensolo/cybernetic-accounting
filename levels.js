@@ -53,7 +53,7 @@
       debrief: [
         'Profit reports what you earned. Cash shows what you can pay with. Credit terms push the two apart, and Receivables is the tank that holds the difference.',
         'In control terms, credit adds a delay to the loop. The signal you see (profit) arrives before the thing you need (cash). A controller that only watches profit will over-steer.',
-        'On the bridge from profit to cash, "customers owe more" is the line that ate your cash.',
+        { when: 'ar', text: 'On the bridge from profit to cash, "customers owe more" is the line that ate your cash.' },
       ],
     },
     {
@@ -197,13 +197,13 @@
     },
     {
       id: 'profitblind', title: 'Profit-watching pilot', scenario: 'growth',
-      params: { alpha: 0.4, cover: 1, gain: 0.4, pipeline: true, watch: 'profit', floor: 8000, borrowGain: 1, autoBench: true },
-      note: 'Borrows when accumulated profit looks low and repays when profit looks healthy. Profit keeps rising, so it pays back the bank just as the cash runs out.',
+      params: { alpha: 0.4, cover: 1, gain: 0.4, pipeline: true, watch: 'profit', floor: 12000, borrowGain: 1, autoBench: true },
+      note: 'Borrows when accumulated profit looks low and repays when profit looks healthy. Profit keeps rising, so it keeps paying back the bank while receivables and stock swallow the cash.',
     },
     {
       id: 'cashsighted', title: 'Cash-watching pilot', scenario: 'growth',
       params: { alpha: 0.4, cover: 1, gain: 0.4, pipeline: true, watch: 'cash', floor: 12000, borrowGain: 1, autoBench: true },
-      note: 'Same rule, different gauge. It watches the variable that actually kills the firm and borrows to keep cash above the floor.',
+      note: 'Exactly the same rule and floor as the profit-watching pilot; only the gauge differs. It watches the variable that actually kills the firm and borrows to keep cash above the floor.',
     },
   ];
 

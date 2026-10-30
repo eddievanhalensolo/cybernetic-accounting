@@ -435,10 +435,10 @@
   function gapSentence(open, close, ni, dcash) {
     const parts = gapParts(open, close);
     if (!parts.length) return 'Profit and the change in cash are the same: no other tank moved.';
-    const list = parts.map(p => `<b>${ACC[p.a].name} ${p.v > 0 ? 'soaked up' : 'released'} ${eur(Math.abs(p.v))}</b> (${p.why})`).join(', ');
-    if (Math.abs(ni - dcash) < 1) return `Profit and cash both ${sgn(ni)}, but only because these moves cancel out: ${list}.`;
-    return `Profit ${sgn(ni)}, cash ${sgn(dcash)}. The ${eur(Math.abs(ni - dcash))} gap is parked in the other tanks: ` +
-      list + '.';
+    // each part's effect on cash, relative to profit
+    const list = parts.map(p => `<b>${ACC[p.a].name} ${sgn(-p.v)}</b> (${p.why})`).join(', ');
+    if (Math.abs(ni - dcash) < 1) return `Profit and cash both ${sgn(ni)}, but only because these cancel out: ${list}.`;
+    return `Profit ${sgn(ni)}, cash ${sgn(dcash)}. From profit to cash: ${list}.`;
   }
 
   // =========================================================================
@@ -570,11 +570,13 @@
   // =========================================================================
   const Play = (() => {
     let L = null, li = 0, game = null, machine = null, busy = false, period = 0, trace = null;
+    let token = 0; // bumped on every (re)start so an abandoned month stops animating
     let pred = { qid: null, pick: null, results: [], last: null };
     const lever = id => $(`.lever[data-lever="${id}"]`);
 
     function start(i) {
       li = i; L = LEVELS[i];
+      token++; busy = false;
       game = E.newGame(L, (Math.random() * 1e9) | 0);
       pred = { qid: null, pick: null, results: [], last: null };
       trace = null; period = 0;
@@ -610,9 +612,10 @@
     }
 
     async function founding() {
-      const rec = game.history[0];
+      const rec = game.history[0], my = token;
       busy = true; lockUI(true);
       await playEntries(rec, true);
+      if (my !== token) return;
       period = 0;
       renderPeriodSel();
       renderPaper($('#paper'), game, period, { printing: true });
@@ -762,6 +765,7 @@
       if (busy || game.status !== 'running') return;
       busy = true; lockUI(true);
       clearTrace();
+      const my = token, stale = () => my !== token;
       const dec = readLevers();
       setLoop('levers');
       await sleep(delay(350));
@@ -772,20 +776,23 @@
         Sound.beep(150, 0.2, 'sawtooth', 0.04);
         await sleep(delay(900));
       }
+      if (stale()) return;
       await playEntries(rec);
+      if (stale()) return;
       setLoop('statements');
       period = rec.m;
       renderPeriodSel();
       renderPaper($('#paper'), game, period, { printing: true });
       renderTrend();
       await sleep(delay(600));
+      if (stale()) return;
       setLoop('compare');
       resolvePrediction(rec);
       busy = false;
       renderConsole();
       lockUI(false);
-      if (game.status !== 'running') { await sleep(delay(700)); finish(); }
-      else setTimeout(() => !busy && setLoop('levers'), delay(900));
+      if (game.status !== 'running') { await sleep(delay(700)); if (!stale()) finish(); }
+      else setTimeout(() => !busy && !stale() && setLoop('levers'), delay(900));
     }
     $('#runBtn').addEventListener('click', runMonth);
 
@@ -800,6 +807,7 @@
     syncSpeed();
 
     async function playEntries(rec, isFounding) {
+      const my = token;
       const disp = { ...rec.open };
       let profit = 0, cash = 0;
       machine.render(disp);
@@ -816,6 +824,7 @@
         renderMeters({ open: rec.open, bal: disp, profit, cash, founding: isFounding });
         Sound.entry(e);
         await sleep(SPEED[settings.speed]);
+        if (my !== token) return;
       }
       machine.render(rec.close);
       machine.clearWires();
@@ -930,7 +939,7 @@
         <h3>Where the profit went</h3>
         <div id="debriefBridge"></div>
         <h3>What to take away</h3>
-        ${L.debrief.map(t => `<p>${esc(t)}</p>`).join('')}
+        ${L.debrief.filter(d => typeof d === 'string' || (d.when === 'ar' && game.history.some(r => r.close.ar > 0))).map(d => `<p>${esc(d.text ?? d)}</p>`).join('')}
         <div class="modal-actions">
           ${li + 1 < LEVELS.length ? `<button type="button" class="primary" data-act="next">Next: ${esc(LEVELS[li + 1].title)}</button>` : `<button type="button" class="primary" data-act="lab">Go to the Governor Lab</button>`}
           <button type="button" data-act="retry">Try again</button>
@@ -968,7 +977,7 @@
       $('#labScenario').innerHTML = Object.entries(LAB_SCENARIOS).map(([k, v]) => `<option value="${k}">${esc(v.title)}</option>`).join('');
       $('#labWatch').innerHTML = Object.entries(E.GAUGES).map(([k, g]) => `<option value="${k}">${esc(g.name)}</option>`).join('');
       $('#presets').addEventListener('click', e => { const b = e.target.closest('[data-preset]'); if (b) applyPreset(b.dataset.preset); });
-      const bind = (id, fn) => $(id).addEventListener('input', () => { fn(); P.preset = null; update(); });
+      const bind = (id, fn) => ['input', 'change'].forEach(ev => $(id).addEventListener(ev, () => { fn(); P.preset = null; update(); }));
       bind('#labScenario', () => { P.scenario = $('#labScenario').value; P.lead = LAB_SCENARIOS[P.scenario].leadTime; });
       bind('#labLead', () => { P.lead = +$('#labLead').value; });
       bind('#labAlpha', () => { P.params.alpha = +$('#labAlpha').value; });
