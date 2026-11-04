@@ -1,4 +1,4 @@
-// Ledger Homeostat: simulation engine.
+// Cybernetic Accounting: simulation engine.
 // The ledger is the only source of truth. Every event is a balanced journal
 // entry; all three statements are derived from the entries, never computed
 // on their own. Works in the browser (window.Engine) and in Node (require).
