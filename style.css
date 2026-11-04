@@ -351,7 +351,7 @@ input[type="checkbox"] { accent-color: var(--signal); width: 16px; height: 16px;
 .row.ind { padding-left: 18px; }
 .row.total { font-weight: 600; border-top: 1px solid var(--ink); }
 .row.grand { font-weight: 600; border-top: 1.5px solid var(--ink); border-bottom: 3px double var(--ink); }
-.row .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row .lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3; }
 .row .link { display: block; font-size: 10.5px; color: var(--muted); font-family: var(--f-body); margin-top: 2px; white-space: normal; }
 .amt { background: none; border: 0; padding: 2px 4px; margin: -2px -4px; border-radius: 3px; font: inherit; text-align: right; }
 .amt:hover { background: color-mix(in srgb, var(--signal) 20%, transparent); }
@@ -472,6 +472,7 @@ input[type="checkbox"] { accent-color: var(--signal); width: 16px; height: 16px;
   .g-sec .pair { grid-template-columns: 1fr; }
   .meter { grid-template-columns: 1fr 70px; }
   .meter .m-track { grid-column: 1 / -1; grid-row: 2; }
+  .bs-grid .row { grid-template-columns: minmax(0, 1fr) 60px 60px 56px; gap: 4px; padding-inline: 4px; font-size: 11px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }

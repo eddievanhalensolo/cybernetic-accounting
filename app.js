@@ -1,4 +1,4 @@
-// Ledger Homeostat: interface. All numbers come from the engine's ledger.
+// Cybernetic Accounting: interface. All numbers come from the engine's ledger.
 (function () {
   'use strict';
   const E = window.Engine;
@@ -1102,7 +1102,7 @@
       t: 'Delays make regulators oscillate',
       cy: 'A controller that corrects hard on a delayed signal overshoots, then corrects the overshoot, and swings.',
       ac: 'Ordering kits with a lead time, and forgetting what is already on the way, makes orders swing harder than demand. Supply chains call it the bullwhip effect.',
-      p: ['In the Governor Lab, switch off "count kits already on the way" and raise the correction strength. The orders line starts to swing far more than demand ever did, and the cash line swings with it. MIT\'s Beer Game teaches the same lesson with paper and dice.'],
+      p: ['In the Governor Lab, switch off "count kits already on the way" and raise the correction strength. The orders line starts to swing far more than demand ever did, and the cash line swings with it. MIT\'s Beer Game teaches the same lesson with a game board, order cards and chips.'],
       cite: 'John Sterman, "Modeling Managerial Behavior" (1989).',
     },
     {
@@ -1122,7 +1122,7 @@
     {
       t: 'The cybernetic firm, for real',
       cy: 'Stafford Beer applied cybernetics to management with the Viable System Model, and in Chile (1971–73) built Cybersyn, a national feedback network for factories.',
-      ac: 'Cybersyn\'s inputs were daily production and finance indicators: a ledger as a nervous system.',
+      ac: 'Cybersyn\'s inputs were daily factory figures such as output, raw materials and absentees: operating records as a nervous system.',
       p: ['This game is a toy version of that idea: one firm, one regulator, a ledger as the sensor and three statements as the display.'],
       cite: 'Stafford Beer, Brain of the Firm (1972); Eden Medina, Cybernetic Revolutionaries (2011).',
     },
